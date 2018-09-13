@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <title>Room Booking - Login</title>
+        <link rel="stylesheet" type="text/css" href="/static/style.css" />
+        <script type="text/javascript" src="/static/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript">
+
+function formJSON(formArray) {
+    var values = {};
+    for(var i = 0; i < formArray.length; i++)
+        values[formArray[i]['name']] = formArray[i]['value'];
+    return JSON.stringify(values);
+}
+
+$(document).ready(function(){
+
+    $('#lemail, #lpassword').keyup(function() {
+        
+        if ($('#lemail').val() !='' && $('#lpassword').val() !=''){
+      
+            $('#lsubmit').removeAttr('disabled');
+        } else {
+            $('#lsubmit').attr('disabled', 'disabled');
+        }
+    });
+
+    $('#login').submit(function(e){
+        e.preventDefault();
+        $.ajax({
+            type:       "POST",
+            url:        "/api/authenticate",
+            contentType:    "application/json",
+            data:       formJSON($(this).serializeArray()),
+            success:    function(data){
+                if(!data['authenticated']){
+                    alert(data['reason']);
+                }else{
+                    alert("success");
+                }
+            }
+        });
+    });        
+});
+
+        </script>
+    </head>
+    <body>
+        <div class="box" id="loginbox">
+            <h2>Welcome. Please Log in:</h2>
+            <form id="login">
+                <input type="text" placeholder="Username or Email Address" name="email" id="lemail" />
+                <input type="password" placeholder="Password" name="password" id="lpassword" />
+                <input type="submit" value="Log in" id="lsubmit" disabled="disabled" />
+            </form>
+        </div>
+    </body>
+</html>

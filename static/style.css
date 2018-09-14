@@ -54,7 +54,7 @@ html,body {
     margin:     auto;
     padding:    0.5em 2em;
 }
-#lemail,#lpassword {
+form input,select {
     width:      100%;
     line-height:    16px;
 

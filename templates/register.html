@@ -2,46 +2,78 @@
     <head>
         <title>Room Booking - Login</title>
         <link rel="stylesheet" type="text/css" href="/static/style.css" />
+        <script type="text/javascript" src="/static/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript">
 
+function formJSON(formArray) {
+    var values = {};
+    for(var i = 0; i < formArray.length; i++)
+        values[formArray[i]['name']] = formArray[i]['value'];
+    return JSON.stringify(values);
+}
+$(document).ready(function(){
+
+  function validateForm() {
+      var valid = true;
+      $('lsurname,lemail,lpassword,lpassword2').each(function (item) {
+          if ($(item).val() == ""){
+              valid = false;
+              return false;
+          }
+      });
+      return valid
+  }
+    /*$('#register input').on('keyup', function(e){
+        empty = false
+        $("#register input").each(function(i, o){
+          if(.val() == '') {
+            empty = true
+          }
+        });
+
+        if(!empty) {
+          $('#lsubmit').removeAttr('disabled');
+        } else {
+          $('#lsubmit').attr('disabled', 'disabled');
+        }
+    });*/
+});
+    </script>
     </head>
     <body>
         <div class="box" id="loginbox">
             <h2>Welcome. Please register:</h2>
-            <form id="register">	
 
-			<select id="title">
-    			<option value="">--Title--</option>
-   			<option value="Dr">Dr</option>
-   			<option value="Miss">Miss</option>
-   			<option value="Mr">Mr</option>
-    			<option value="Mrs">Mrs</option>
-    			<option value="Ms">Ms</option>
-			</select>
+            <form id="register">
 
+			           <select id="ltitle">
+    			             <option value="">--Title--</option>
+   			               <option value="Dr">Dr</option>
+   			               <option value="Miss">Miss</option>
+   			               <option value="Mr">Mr</option>
+    			             <option value="Mrs">Mrs</option>
+    			             <option value="Ms">Ms</option>
+			           </select>
 
-		<input type="text" placeholder="Surname" name="surname" id="surname"/>
-			<select id="department">
-    			<option value="">--Departments--</option>
-   			<option value="dog">Maths</option>
-   			<option value="cat">English</option>
-			<option value="hamster">Science</option>
-    			<option value="parrot">Art</option>
-    			<option value="spider">BICT</option>
-			<option value="dog">Modern languages</option>
-   			<option value="cat">Social subjects</option>
-			<option value="hamster">RMPS</option>
-    			<option value="parrot">Design and tech</option>
-    			<option value="spider">Drama</option>
+		            <input type="text" placeholder="Surname" name="surname" id="lsurname"/>
 
-			</select>
-	
-
-
+			          <select id="ldepartment">
+      	            <option value="">--Departments--</option>
+     		            <option value="maths">Maths</option>
+             		    <option value="english">English</option>
+          			    <option value="science">Science</option>
+              	    <option value="art">Art</option>
+              	    <option value="bict">BICT</option>
+          			    <option value="modernLanguages">Modern languages</option>
+             		    <option value="socialSubects">Social subjects</option>
+          			    <option value="rmps">RMPS</option>
+              	    <option value="designAndTech">Design and tech</option>
+              	    <option value="drama">Drama</option>
+			         </select>
 
                 <input type="text" placeholder="Email address" name="email" id="lemail" />
                 <input type="password" placeholder="Password" name="password" id="lpassword" />
-		<input type="password" placeholder="Confirm password" id="lpassword2" />
-			
+		            <input type="password" placeholder="Confirm password" id="lpassword2" />
 
                 <input type="submit" value="Register" id="lsubmit" disabled="disabled" />
             </form>

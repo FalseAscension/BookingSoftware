@@ -15,9 +15,9 @@ function formJSON(formArray) {
 $(document).ready(function(){
 
     $('#lemail, #lpassword').keyup(function() {
-        
+
         if ($('#lemail').val() !='' && $('#lpassword').val() !=''){
-      
+
             $('#lsubmit').removeAttr('disabled');
         } else {
             $('#lsubmit').attr('disabled', 'disabled');
@@ -35,12 +35,12 @@ $(document).ready(function(){
                 if(!data['authenticated']){
                     	alert(data['reason']);
                 }else{
-			window.location.replace(data['redirect'])	
+			window.location.replace(data['redirect'])
                     	alert("success")
                 }
             }
         });
-    });        
+    });
 });
 
         </script>
@@ -52,6 +52,7 @@ $(document).ready(function(){
                 <input type="text" placeholder="Username or Email Address" name="email" id="lemail" />
                 <input type="password" placeholder="Password" name="password" id="lpassword" />
                 <input type="submit" value="Log in" id="lsubmit" disabled="disabled" />
+                <input type="button" onclick="location.href='/register';" value="Register" />
             </form>
         </div>
     </body>

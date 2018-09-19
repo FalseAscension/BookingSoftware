@@ -13,30 +13,20 @@ function formJSON(formArray) {
 }
 $(document).ready(function(){
 
-  function validateForm() {
-      var valid = true;
-      $('lsurname,lemail,lpassword,lpassword2').each(function (item) {
-          if ($(item).val() == ""){
-              valid = false;
-              return false;
-          }
-      });
-      return valid
-  }
-    /*$('#register input').on('keyup', function(e){
+    $('#register input').on('keyup', function(e){
         empty = false
         $("#register input").each(function(i, o){
-          if(.val() == '') {
+          if(()'#register input').val() == '') {
             empty = true
           }
         });
 
-        if(!empty) {
+        if(empty=false) {
           $('#lsubmit').removeAttr('disabled');
         } else {
           $('#lsubmit').attr('disabled', 'disabled');
         }
-    });*/
+    });
 });
     </script>
     </head>

@@ -3,14 +3,19 @@ from passlib.hash import bcrypt
 from sqlitedb import database
 import json,os
 
+# Other project files
+import login
+
 # Initialise Flask App
 app = Flask(__name__)
+app.register_blueprint(login)
 app.secret_key = os.urandom(24)
 
 # Database file
 dbfile = "booking.db"
 
 @app.route('/')
+@app.route('/index.html')
 def home():
     if 'UUID' in session:
         return render_template('index.html', user="Test User")
@@ -21,6 +26,11 @@ def home():
 def api(req=None):
     return json.dumps({})
 
+@app.route('/register')
+@login.route('/register.html')
+def register():
+    return render_template('register.html')
+
 # API User authentication
 @app.route('/api/authenticate', methods=['POST'])
 def authenticate():
@@ -28,7 +38,7 @@ def authenticate():
     return Response(json.dumps(response), status=status, mimetype="application/json")
 
 def doAuthenticate():
-    
+
     # User is already authenticated...
     if 'UUID' in session:
         return {    "authenticated":    True,
@@ -52,7 +62,7 @@ def doAuthenticate():
                     "reason":           "Client Error: Must provide both email and password"    },400
 
     # Initialise the database object and fetch data from it.
-    db = database(dbfile)                 
+    db = database(dbfile)
     user = db.getUserByEmail(email)
     db.close()
 
@@ -61,7 +71,7 @@ def doAuthenticate():
         return {    "authenticated":    False,
                     "reason":           "0 tries remaining.",
                     "triesRemaining":   0  },200    # Deny authentication for reason 0 tries remaining.
-                    
+
     # Check the user exists
     if not user:
         return {    "authenticated":    False,
@@ -69,10 +79,10 @@ def doAuthenticate():
 
     # Verify password...
     if bcrypt.verify(password, user['password']):
-        session['UUID'] = user['UUID'] 
+        session['UUID'] = user['UUID']
         return {    "authenticated":   True,    # Allow authenitcation and give location for AJAX redirect.
                     "redirect":        "/index.html"   },200
-    
+
     print(f"Incorrect password was entered for user {user['email']}")
 
     # Password must be incorrect.
@@ -85,6 +95,7 @@ def doAuthenticate():
     return {    "authenticated":        False,  # Deny authentication for reason incorrect password.
                 "reason":               "Incorrect Password.",
                 "triesRemaining":       5 - tries  },200
+
 
 if __name__ == "__main__":
     app.run()

@@ -33,9 +33,10 @@ $(document).ready(function(){
             data:       formJSON($(this).serializeArray()),
             success:    function(data){
                 if(!data['authenticated']){
-                    alert(data['reason']);
+                    	alert(data['reason']);
                 }else{
-                    alert("success");
+			window.location.replace(data['redirect'])	
+                    	alert("success")
                 }
             }
         });

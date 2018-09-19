@@ -7,6 +7,9 @@ import json,os
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
+# Database file
+dbfile = "booking.db"
+
 @app.route('/')
 def home():
     if 'UUID' in session:
@@ -30,15 +33,6 @@ def doAuthenticate():
     if 'UUID' in session:
         return {    "authenticated":    True,
                     "redirect":         "/index.html" },200
-       
-    # Only allow 5 tries.
-    ## TODO storing this in session is not secure. Use database instead.
-    if 'triesRemaining' not in session:       # Keep track of how many tries user has remaining.
-        session['triesRemaining'] = 5
-    elif session['triesRemaining'] == 0:        # User has run out of tries.
-        return {    "authenticated":    False,
-                    "reason":           "0 tries remaining.",
-                    "triesRemaining":   0  },200    # Deny authentication for reason 0 tries remaining.
 
     # Ensure data is of a valid type
     if request.content_type in ("application/json", "json"):
@@ -56,12 +50,18 @@ def doAuthenticate():
     else:                                       # Client did not provide email and password. 400 Bad Request.
         return {    "authenticated":    False,
                     "reason":           "Client Error: Must provide both email and password"    },400
-    
+
     # Initialise the database object and fetch data from it.
-    db = database("booking.db")                 
-    user = db.getUserByEmail(email)             
-    db.close()                                  
-    
+    db = database(dbfile)                 
+    user = db.getUserByEmail(email)
+    db.close()
+
+    # Only allow 5 tries.
+    if user['incorrectTries'] == 5:        # User has run out of tries.
+        return {    "authenticated":    False,
+                    "reason":           "0 tries remaining.",
+                    "triesRemaining":   0  },200    # Deny authentication for reason 0 tries remaining.
+                    
     # Check the user exists
     if not user:
         return {    "authenticated":    False,
@@ -72,12 +72,19 @@ def doAuthenticate():
         session['UUID'] = user['UUID'] 
         return {    "authenticated":   True,    # Allow authenitcation and give location for AJAX redirect.
                     "redirect":        "/index.html"   },200
+    
+    print(f"Incorrect password was entered for user {user['email']}")
 
     # Password must be incorrect.
-    session['triesRemaining'] -= 1              # Decrement remaining tries.
+    print(user['incorrectTries'])
+    tries = user['incorrectTries'] + 1                 # Append one to tries
+    print(tries)
+    db = database(dbfile)
+    db.updateUserTriesByUUID(user['uuid'], tries)
+    db.close()
     return {    "authenticated":        False,  # Deny authentication for reason incorrect password.
                 "reason":               "Incorrect Password.",
-                "triesRemaining":       session['triesRemaining']  },200
+                "triesRemaining":       5 - tries  },200
 
 if __name__ == "__main__":
     app.run()

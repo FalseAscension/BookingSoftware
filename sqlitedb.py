@@ -19,10 +19,10 @@ class database():
         cursor.execute("SELECT * FROM USERS WHERE UUID=?", (uuid,))
         return cursor.fetchone()
 
-    def updateUserTriesByUUID(self, uuid, tries):
+    def updateUserTriesByUUID(self, uuid, tries, timestamp):
         cursor = self.connection.cursor()
 
-        cursor.execute("UPDATE USERS SET incorrectTries=? WHERE UUID=?", (tries,uuid))
+        cursor.execute("UPDATE USERS SET incorrectTries=?, timeStamp=? WHERE UUID=?", (tries,uuid,timestamp))
         return self.connection.commit()
 
 if __name__ == "__main__":

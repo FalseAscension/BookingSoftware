@@ -1,14 +1,10 @@
 from flask import Flask, Response, request, render_template, session
 from passlib.hash import bcrypt
 from sqlitedb import database
-import json,os
-
-# Other project files
-import login
+import json,os,time
 
 # Initialise Flask App
 app = Flask(__name__)
-app.register_blueprint(login)
 app.secret_key = os.urandom(24)
 
 # Database file
@@ -18,7 +14,10 @@ dbfile = "booking.db"
 @app.route('/index.html')
 def home():
     if 'UUID' in session:
-        return render_template('index.html', user="Test User")
+        db = database(dbfile)
+        user = db.getUserByUUID(session['UUID'])
+        db.close()
+        return render_template('index.html', user=user['realname'])
     else:
         return render_template('login.html')
 
@@ -27,7 +26,7 @@ def api(req=None):
     return json.dumps({})
 
 @app.route('/register')
-@login.route('/register.html')
+@app.route('/register.html')
 def register():
     return render_template('register.html')
 
@@ -80,6 +79,9 @@ def doAuthenticate():
     # Verify password...
     if bcrypt.verify(password, user['password']):
         session['UUID'] = user['UUID']
+        db = database(dbfile)
+        db.updateUserTriesByUUID(user['uuid'], 0, time.time())
+        db.close()
         return {    "authenticated":   True,    # Allow authenitcation and give location for AJAX redirect.
                     "redirect":        "/index.html"   },200
 
@@ -90,7 +92,7 @@ def doAuthenticate():
     tries = user['incorrectTries'] + 1                 # Append one to tries
     print(tries)
     db = database(dbfile)
-    db.updateUserTriesByUUID(user['uuid'], tries)
+    db.updateUserTriesByUUID(user['uuid'], tries, time.time())
     db.close()
     return {    "authenticated":        False,  # Deny authentication for reason incorrect password.
                 "reason":               "Incorrect Password.",

@@ -12,17 +12,17 @@ class database():
     def getUserByEmail(self, email):
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM USERS WHERE email=?", (email,))
-        return cursor.fetchone()
+        return dict(cursor.fetchone())
 
     def getUserByUUID(self, uuid):
         cursor = self.connection.cursor()
         cursor.execute("SELECT * FROM USERS WHERE UUID=?", (uuid,))
-        return cursor.fetchone()
+        return dict(cursor.fetchone())
 
     def updateUserTriesByUUID(self, uuid, tries, timestamp):
         cursor = self.connection.cursor()
 
-        cursor.execute("UPDATE USERS SET incorrectTries=?, timeStamp=? WHERE UUID=?", (tries,uuid,timestamp))
+        cursor.execute("UPDATE USERS SET incorrectTries=?, incorrectTime=? WHERE UUID=?", (tries,timestamp,uuid))
         return self.connection.commit()
 
 if __name__ == "__main__":

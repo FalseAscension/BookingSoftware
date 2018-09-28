@@ -67,10 +67,15 @@ def doAuthenticate():
 
     # Only allow 5 tries.
     if user['incorrectTries'] == 5:        # User has run out of tries.
-        return {    "authenticated":    False,
-                    "reason":           "0 tries remaining.",
+        if time.time() - user['incorrectTime'] > 30: # Allow again after 10 minutes.
+            user['incorrectTries'] = 0;
+            db = database(dbfile)
+            db.updateUserTriesByUUID(user['UUID'], 0, user['incorrectTime'])
+            db.close()
+        else:
+            return {    "authenticated":    False,
+                    "reason":           f"0 attempts remaining. Try again in {int(user['incorrectTime'] + 30 - time.time())} seconds.",
                     "triesRemaining":   0  },200    # Deny authentication for reason 0 tries remaining.
-
     # Check the user exists
     if not user:
         return {    "authenticated":    False,
@@ -80,19 +85,18 @@ def doAuthenticate():
     if bcrypt.verify(password, user['password']):
         session['UUID'] = user['UUID']
         db = database(dbfile)
-        db.updateUserTriesByUUID(user['uuid'], 0, time.time())
+        db.updateUserTriesByUUID(user['UUID'], 0, time.time())
         db.close()
         return {    "authenticated":   True,    # Allow authenitcation and give location for AJAX redirect.
                     "redirect":        "/index.html"   },200
 
-    print(f"Incorrect password was entered for user {user['email']}")
-
     # Password must be incorrect.
     print(user['incorrectTries'])
     tries = user['incorrectTries'] + 1                 # Append one to tries
-    print(tries)
+
+    # Store incorrect tries & time of last attempt in database.
     db = database(dbfile)
-    db.updateUserTriesByUUID(user['uuid'], tries, time.time())
+    db.updateUserTriesByUUID(user['UUID'], tries, time.time())
     db.close()
     return {    "authenticated":        False,  # Deny authentication for reason incorrect password.
                 "reason":               "Incorrect Password.",

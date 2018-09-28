@@ -12,22 +12,41 @@ function formJSON(formArray) {
     return JSON.stringify(values);
 }
 $(document).ready(function(){
+    /*foreach($"#register input" as $item){
+      $('#register input').on('keyup', function(e){
+          empty = false
+          $("#register input").each(function(i, o){
+            if(('#register input').val() == '') {
+              empty = true
+            }
+          });
 
-    $('#register input').on('keyup', function(e){
-        empty = false
-        $("#register input").each(function(i, o){
-          if(()'#register input').val() == '') {
-            empty = true
+          if(empty=false) {
+            $('#lsubmit').removeAttr('disabled');
+          } else {
+            $('#lsubmit').attr('disabled', 'disabled');
           }
+    });
+};*/
+    $('#register').change(function() {
+        console.log("Form has been changed.")
+
+        var empty = false;
+        $('#register').each(function(i, inp) {
+            if (val(inp) == '') {
+                empty = true;
+                console.log("empty val found");
+            }
         });
 
-        if(empty=false) {
-          $('#lsubmit').removeAttr('disabled');
+        if (empty) {
+            $('#register').attr('disabled', 'disabled');
         } else {
-          $('#lsubmit').attr('disabled', 'disabled');
+            $('#register').removeAttr('disabled');
         }
     });
 });
+
     </script>
     </head>
     <body>

@@ -25,6 +25,22 @@ class database():
         cursor.execute("UPDATE USERS SET incorrectTries=?, incorrectTime=? WHERE UUID=?", (tries,timestamp,uuid))
         return self.connection.commit()
 
+    def getRooms(self):
+        cursor = self.connection.cursor()
+
+        rooms = []
+        for r in cursor.execute("SELECT roomNo FROM rooms"):
+            rooms.append(r[0])
+        return rooms
+
+    def getBookings(self, date):
+        cursor = self.connection.cursor()
+
+        bookings = []
+        for b in cursor.execute("SELECT bookingID,byUser FROM bookings WHERE date=?", (date,)):
+            bookings.append(dict(b))
+        return bookings
+
 if __name__ == "__main__":
     bdb = database("booking.db")
     user = bdb.getUserByEmail("emil.carr@protonmail.com")

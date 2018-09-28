@@ -3,6 +3,12 @@ from passlib.hash import bcrypt
 from sqlitedb import database
 import json,os,time
 
+db = database("booking.db")
+rooms = db.getRooms()
+print(rooms)
+b = db.getBookings("28-09-2018")
+print(b)
+
 # Initialise Flask App
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
@@ -102,6 +108,19 @@ def doAuthenticate():
                 "reason":               "Incorrect Password.",
                 "triesRemaining":       5 - tries  },200
 
+@app.route('/api/getRooms')
+def getRooms():
+    db = database("booking.db")
+    rooms = db.getRooms()
+    return Response(json.dumps(rooms), status=200, mimetype="application/json")
+
+@app.route('/api/getBookings', methods=["GET"])
+def getBookings():
+    db = database("booking.db")
+    if "date" not in request.args:
+        return Response("Bad request", status=400, mimetype="application/json");
+    bookings = db.getBookings(request.args.get("date"))
+    return Response(json.dumps(bookings), status=200, mimetype="application/json")
 
 if __name__ == "__main__":
     app.run()

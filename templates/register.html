@@ -3,59 +3,36 @@
         <title>Room Booking - Login</title>
         <link rel="stylesheet" type="text/css" href="/static/style.css" />
         <script type="text/javascript" src="/static/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="/static/include.js"></script>
         <script type="text/javascript">
 
-function formJSON(formArray) {
-    var values = {};
-    for(var i = 0; i < formArray.length; i++)
-        values[formArray[i]['name']] = formArray[i]['value'];
-    return JSON.stringify(values);
-}
 $(document).ready(function(){
-    /*foreach($"#register input" as $item){
-      $('#register input').on('keyup', function(e){
-          empty = false
-          $("#register input").each(function(i, o){
-            if(('#register input').val() == '') {
-              empty = true
-            }
-          });
+  // Ensure all fields are filled before submit
+  var validation = function(){ensurePasswordsMatch('#register', '#p1', '#p2'); validateForm('#register');};
+  $('#register').change(validation);
+  $('#register > input').keyup(validation);
 
-          if(empty=false) {
-            $('#lsubmit').removeAttr('disabled');
-          } else {
-            $('#lsubmit').attr('disabled', 'disabled');
-          }
-    });
-};*/
-    $('#register').change(function() {
-        console.log("Form has been changed.")
+  $('#register').submit(function(e){
+      e.preventDefault();
+      $.ajax({
+          type:       "POST",
+          contentType:"application/json",
+          data:       formJSON($(this).serializeArray()),
+          success:    function(response){}
+      });
+  });
 
-        var empty = false;
-        $('#register').each(function(i, inp) {
-            if (val(inp) == '') {
-                empty = true;
-                console.log("empty val found");
-            }
-        });
-
-        if (empty) {
-            $('#register').attr('disabled', 'disabled');
-        } else {
-            $('#register').removeAttr('disabled');
-        }
-    });
 });
 
     </script>
     </head>
     <body>
-        <div class="box" id="loginbox">
+        <div class="login box">
             <h2>Welcome. Please register:</h2>
 
             <form id="register">
 
-			           <select id="ltitle">
+			           <select name="title">
     			             <option value="">--Title--</option>
    			               <option value="Dr">Dr</option>
    			               <option value="Miss">Miss</option>
@@ -64,9 +41,9 @@ $(document).ready(function(){
     			             <option value="Ms">Ms</option>
 			           </select>
 
-		            <input type="text" placeholder="Surname" name="surname" id="lsurname"/>
+		            <input type="text" placeholder="Surname" name="surname"/>
 
-			          <select id="ldepartment">
+			          <select name="department">
       	            <option value="">--Departments--</option>
      		            <option value="maths">Maths</option>
              		    <option value="english">English</option>
@@ -76,15 +53,15 @@ $(document).ready(function(){
           			    <option value="modernLanguages">Modern languages</option>
              		    <option value="socialSubects">Social subjects</option>
           			    <option value="rmps">RMPS</option>
-              	    <option value="designAndTech">Design and tech</option>
+              	    <option value="designAndTech">Design and Tech</option>
               	    <option value="drama">Drama</option>
 			         </select>
 
-                <input type="text" placeholder="Email address" name="email" id="lemail" />
-                <input type="password" placeholder="Password" name="password" id="lpassword" />
-		            <input type="password" placeholder="Confirm password" id="lpassword2" />
+                <input type="text" placeholder="Email address" name="email"/>
+                <input type="password" placeholder="Password" name="password" id="p1" />
+		            <input type="password" placeholder="Confirm password" id="p2" />
 
-                <input type="submit" value="Register" id="lsubmit" disabled="disabled" />
+                <input type="submit" value="Register" disabled="disabled" />
             </form>
         </div>
     </body>

@@ -15,6 +15,7 @@ html,body {
     padding:    1em;
     margin-bottom:  1em;
 }
+
 #header {
     position:   absolute;
     top:        0;
@@ -48,11 +49,20 @@ html,body {
     margin:     1em;
     padding-left:   1em;
 }
-#loginbox {
+
+.login {
+    position: absolute;
+    top: 50vh;
+    left: 50vw;
+    transform: translateX(-50%) translateY(-50%);
+
     width:      30em;
     height:     30em;
-    margin:     auto;
+
     padding:    0.5em 2em;
+}
+.login a {
+    float: right;
 }
 form input,select {
     width:      100%;
@@ -65,6 +75,15 @@ form input,select {
     border: 1px solid #efefef;
     border-radius:  5px;
 }
+input[data-valid="true"]::after {
+  content: '✓';
+  color: green;
+}
+input[data-valid="false"]::after {
+  content: 'x';
+  color: 'red';
+}
+
 #toast {
   position:absolute;
   bottom: 2em;
@@ -80,3 +99,86 @@ form input,select {
   width: 28em;
   height: 2em;
 }
+
+/*
+  ______________________
+ |                       |
+ |  |_| |_| |_| |_| |_|<  cal div - flex row.
+ |                       |
+ |  |_| |_| |_| |_| |_|  |
+ |  |_| |_| |_| |_| |_|  |
+ |  |_| |_| |_| |_| |_|  |
+ |  |_| |_| |_| |_| |_|  |
+ |  |_| |_| |_| |_| |_|  |
+ |   ^ cday - flex col  |
+  _______________________ cal - flex column
+
+*/
+
+.cal {
+  display: inline-flex;
+  flex-direction: column;
+
+  width:auto;
+  height: 26.25em;
+  overflow-y: scroll;
+
+  background-color: #f5f5f5;
+}
+.cal > div {
+  display: flex;
+  flex-direction: row;
+}
+
+.chead { /* Calendar headings */
+  text-align: right;
+  font-weight: bold;
+}
+.chead > .citm {
+  height: 2.75em;
+  color: #000;
+}
+
+.cday { /* One col in the calendar */
+  display: flex;
+  flex-direction: column;
+}
+
+.citm { /* Individual Calendar Item */
+  width: 6.5em;
+  height: 6.5em;
+  padding: 0.5em;
+
+  background-color: #fff;
+  color: #ccc;
+
+  border: 1px solid #f5f5f5;
+}
+.citm p {
+  margin: 0;
+
+  font-size: 75%;
+}
+
+.cday > .citm:hover {
+  background-color: #f5f5f5;
+  cursor: pointer;
+  color: #000;
+}
+
+.booked {
+  background-color: #f5f5f5;
+}
+
+/*.citm:nth-child(odd) {
+  background-color: #f5f5f5;
+}
+.citm:nth-child(even) {
+  background-color: #fff;
+}
+.cday:nth-child(odd) > .citm {
+  background-color: #f5f5f5;
+}
+.cday:nth-child(even) > .citm {
+  background-color: #fff;
+}*/

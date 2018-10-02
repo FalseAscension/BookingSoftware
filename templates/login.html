@@ -3,26 +3,12 @@
         <title>Room Booking - Login</title>
         <link rel="stylesheet" type="text/css" href="/static/style.css" />
         <script type="text/javascript" src="/static/jquery-3.3.1.min.js"></script>
+        <script type="text/javascript" src="/static/include.js"></script>
         <script type="text/javascript">
-
-function formJSON(formArray) {
-    var values = {};
-    for(var i = 0; i < formArray.length; i++)
-        values[formArray[i]['name']] = formArray[i]['value'];
-    return JSON.stringify(values);
-}
 
 $(document).ready(function(){
 
-    $('#lemail, #lpassword').keyup(function() {
-
-        if ($('#lemail').val() !='' && $('#lpassword').val() !=''){
-
-            $('#lsubmit').removeAttr('disabled');
-        } else {
-            $('#lsubmit').attr('disabled', 'disabled');
-        }
-    });
+    $('#login > input').keyup(function(){validateForm('#login')})
 
     $('#login').submit(function(e){
         e.preventDefault();
@@ -31,12 +17,11 @@ $(document).ready(function(){
             url:        "/api/authenticate",
             contentType:    "application/json",
             data:       formJSON($(this).serializeArray()),
-            success:    function(data){
-                if(!data['authenticated']){
-                    	alert(data['reason']);
+            success:    function(response){
+                if(!response['authenticated']){
+                  alert(response['reason']);
                 }else{
-			window.location.replace(data['redirect'])
-                    	alert("success")
+			            window.location.replace(response['redirect']);
                 }
             }
         });
@@ -46,14 +31,14 @@ $(document).ready(function(){
         </script>
     </head>
     <body>
-        <div class="box" id="loginbox">
-            <h2>Welcome. Please Log in:</h2>
+        <div class="login box">
+            <h2>Welcome. Please Log in: </h2>
             <form id="login">
-                <input type="text" placeholder="Username or Email Address" name="email" id="lemail" />
-                <input type="password" placeholder="Password" name="password" id="lpassword" />
-                <input type="submit" value="Log in" id="lsubmit" disabled="disabled" />
-                <input type="button" onclick="location.href='/register';" value="Register" />
+                <input type="text" placeholder="Username or Email Address" name="email"/>
+                <input type="password" placeholder="Password" name="password"/>
+                <input type="submit" value="Log in" disabled="disabled" />
             </form>
+            <a href="/register">Sign Up</a>
         </div>
     </body>
 </html>

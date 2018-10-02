@@ -5,28 +5,22 @@
 		<title>Dougie Server!</title>
 		<link rel="stylesheet" type="text/css" href="/static/style.css" />
 		<script type="text/javascript" src="/static/jquery-3.3.1.min.js"></script>
+		<script type="text/javascript" src="/static/include.js"></script>
 		<script type="text/javascript">
-
-			function generateTable(data){
-				var table = $("<table>");
-				$.each(data, function(rIndex,r){
-					var row = $("<tr/>");
-					$.each(r, function(cIndex, c){
-						row.append($("<t" + (rIndex == 0 ? "h":"d") + "/>").text(c) );
-					});
-					table.append(row);
-				});
-				return table;
-			}
 			$(document).ready(function(){
-				var data = [["title","title","title"],
-										["row","row","row"],
-										["row","row","row"],
-										["row","row","row"],
-										["row","row","row"]];
-				var table = generateTable(data);
-				console.log(table);
-				$("#calendar").append(table);
+
+				var thisWeek = new Date();
+				thisWeek.setDate(thisWeek.getDate() - thisWeek.getDay());
+
+				$.ajax({
+							type: "GET",
+							url:  "/api/getTimes",
+							success: function(days){
+								var cal = generateCalendar(days);
+								populateCalendar(cal, days, thisWeek);
+								$("#calendar").append(cal);
+							}
+				});
 			});
 
 		</script>
@@ -37,9 +31,7 @@
 		</div>
         <div class="box" id="account"><h2>Welcome {{ user }}!</h2></div>
         <div id="body">
-            <div id="calendar" class="panel box">
-
-						</div>
+            <div id="calendar" class="panel box"></div>
             <div class="panel box"><p>Find a room</p></div>
         </div>
 	</body>

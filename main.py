@@ -1,13 +1,7 @@
 from flask import Flask, Response, request, render_template, session
 from passlib.hash import bcrypt
 from sqlitedb import database
-import json,os,time
-
-db = database("booking.db")
-rooms = db.getRooms()
-print(rooms)
-b = db.getBookings("28-09-2018")
-print(b)
+import json,os,time,datetime
 
 # Initialise Flask App
 app = Flask(__name__)
@@ -16,9 +10,18 @@ app.secret_key = os.urandom(24)
 # Database file
 dbfile = "booking.db"
 
+# Load settings from the database
+db = database(dbfile)
+settings = db.getSettings()
+db.close()
+
+print(settings['admins'])
+
 @app.route('/')
 @app.route('/index.html')
 def home():
+    if 'nologin' in settings:
+        session['UUID'] = "4de2f84f-8c08-484f-942b-4f9bd8ab5ee4"
     if 'UUID' in session:
         db = database(dbfile)
         user = db.getUserByUUID(session['UUID'])
@@ -31,10 +34,34 @@ def home():
 def api(req=None):
     return json.dumps({})
 
-@app.route('/register')
-@app.route('/register.html')
-def register():
-    return render_template('register.html')
+@app.route('/api/getRooms')
+def getRooms():
+    return Response(json.dumps(settings['rooms']), status=200, mimetype="application/json")
+
+@app.route('/api/getTimes')
+def getTimes():
+    return Response(json.dumps(settings['times']), status=200, mimetype="application/json")
+
+@app.route('/api/getBookings', methods=["GET"])
+def getBookings():
+    if 'date' in request.args:
+        date = request.args['date']
+    else:
+        date = datetime.date.today().isoformat()
+    db = database("booking.db")
+    bookings = db.getBookings(request.args.get("date"))
+    db.close()
+    return Response(json.dumps(bookings), status=200, mimetype="application/json")
+
+@app.route('/api/updateSettings')
+def updateSettings():
+    global settings
+    if 'UUID' not in session or session['UUID'] not in settings['admins']:
+        return Response('{"status":"denied", "reason":"Not logged in as admin."}', status=400, mimetype="application/json")
+    db = database(dbfile)
+    settings = db.getSettings()
+    db.close()
+    return Response('{"status":"ok"}', status=400, mimetype="application/json")
 
 # API User authentication
 @app.route('/api/authenticate', methods=['POST'])
@@ -108,19 +135,14 @@ def doAuthenticate():
                 "reason":               "Incorrect Password.",
                 "triesRemaining":       5 - tries  },200
 
-@app.route('/api/getRooms')
-def getRooms():
-    db = database("booking.db")
-    rooms = db.getRooms()
-    return Response(json.dumps(rooms), status=200, mimetype="application/json")
-
-@app.route('/api/getBookings', methods=["GET"])
-def getBookings():
-    db = database("booking.db")
-    if "date" not in request.args:
-        return Response("Bad request", status=400, mimetype="application/json");
-    bookings = db.getBookings(request.args.get("date"))
-    return Response(json.dumps(bookings), status=200, mimetype="application/json")
+@app.route('/register')
+@app.route('/register.html')
+def register():
+    return render_template('register.html')
 
 if __name__ == "__main__":
+    app.config.update(
+        TEMPLATES_AUTO_RELOAD=True,
+        TESTING=True
+    );
     app.run()

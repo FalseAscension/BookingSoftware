@@ -1,4 +1,4 @@
-import sqlite3
+import sqlite3,json
 
 class database():
 
@@ -25,20 +25,21 @@ class database():
         cursor.execute("UPDATE USERS SET incorrectTries=?, incorrectTime=? WHERE UUID=?", (tries,timestamp,uuid))
         return self.connection.commit()
 
-    def getRooms(self):
+    def getSettings(self):
         cursor = self.connection.cursor()
 
-        rooms = []
-        for r in cursor.execute("SELECT roomNo FROM rooms"):
-            rooms.append(r[0])
-        return rooms
+        settings = {}
+        for s in cursor.execute("SELECT name,value FROM settings"):
+            settings[s['name']] = json.loads(s['value'])
+        return settings
 
     def getBookings(self, date):
         cursor = self.connection.cursor()
 
         bookings = []
-        for b in cursor.execute("SELECT bookingID,byUser FROM bookings WHERE date=?", (date,)):
+        for b in cursor.execute("SELECT bookingID,time,byUser FROM bookings WHERE date=?", (date,)):
             bookings.append(dict(b))
+
         return bookings
 
 if __name__ == "__main__":

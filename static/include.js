@@ -1,7 +1,7 @@
-// Get Days of the week in given locale
+// Get Days of the week in given locale (ISO week starts on Mon)
 function getWeekDays(locale)
 {
-    var baseDate = new Date(Date.UTC(2017, 0, 1)); // just a Sunday
+    var baseDate = new Date(Date.UTC(2017, 0, 2)); // just a Monday
     var weekDays = [];
     for(i = 0; i < 7; i++)
     {
@@ -37,25 +37,20 @@ function generateCalendar(daylist){
 }
 
 function populateCalendar(cal, days, weekBeginning) {
-  $.each(days, function(dIndex, d){
-    var date = new Date();
-    date.setDate(weekBeginning.getDate() + d['day']);
-    $.ajax({
+  $.each(days, function(dIndex, day){ // Loop through each day room is available
+    var date = moment(weekBeginning).add(day['day'], 'day'); // Add on x amount of days to start of week
+    $.ajax({ // Make a request to the API to get any existing bookings on a given day
           type: "GET",
           url: "/api/getBookings",
-          data: {date:date.toISOString().split("T")[0]},
+          data: {date:date.format("YYYY-MM-DD")}, // ISO date format
           success: function(response) {
-            $.each(response, function(bIndex, b){
-              $(cal).find("#d" + d['day'] + " #" + b['time']).addClass("booked").attr("data-bookingid", b['bookingID']).text("Booked");
-              console.log("#d" + d['day'] + " #" + b['time']);
+            $.each(response, function(bIndex, booking){
+              // Within given day in the DOM, find correct time slot (using IDs) & highlight it as booked
+              $(cal).find("#d" + day['day'] + " #" + booking['time']).addClass("booked").attr("data-bookingid", booking['bookingID']).text("Booked");
             });
           }
     });
   });
-}
-
-function displayBooking(booking){
-  return $("<div>").addClass("citm").text(booking["bookingID"]);
 }
 
 // Ensure all fields have been filled out and passwords match.
